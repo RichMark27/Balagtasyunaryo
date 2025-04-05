@@ -3,6 +3,7 @@ import { PORT, NODE_ENV } from "./config/env.js";
 import dictionaryRouter from "./routes/dictionary.routes.js";
 import connectDB from "./database/mongodb.js";
 import path from "path";
+import buodRouter from "./routes/buod.routes.js";
 
 //env
 const port = PORT || 4000;
@@ -20,6 +21,7 @@ app.use((req, res, next) => {
 
 //routes
 app.use("/api/dictionary", dictionaryRouter);
+app.use("/api/buod", buodRouter);
 
 if (NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "/frontend/dist")));

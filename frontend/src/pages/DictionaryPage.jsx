@@ -2,13 +2,10 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
-import SearchResultList from "../components/SearchResultList";
 import { Link } from "react-router-dom";
-import Florante_at_Laura from "../assets";
+import LandingPageImg from "../assets/img/Florante_at_Laura.png";
 
 function DictionaryPage() {
-  const [results, setResults] = useState([]);
-
   const [dictionary, setDictionary] = useState([]);
   let { id } = useParams();
 
@@ -16,23 +13,18 @@ function DictionaryPage() {
     fetch(`/api/dictionary/${id}`)
       .then((response) => response.json())
       .then((data) => setDictionary(data));
-
-    setResults("");
   }, [id]);
 
   return (
     <div>
       <header className="absolute w-full flex justify-between items-center py-4 px-8 lg:px-16 z-20">
         <div>
-          <SearchBar setResults={setResults} />
-          {results && results.length > 0 && (
-            <SearchResultList results={results} />
-          )}
+          <SearchBar />
         </div>
 
         <Link to={"/"}>
           <div className="h-15 w-15 lg:h-20 lg:w-20 rounded-full">
-            <img src={Florante_at_Laura} alt="Logo" />
+            <img src={LandingPageImg} alt="Logo" />
           </div>
         </Link>
       </header>

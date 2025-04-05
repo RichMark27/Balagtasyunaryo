@@ -1,63 +1,97 @@
-import { useState, useEffect } from "react";
-import SearchResultList from "./SearchResultList";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
-function SearchBar({ setResults }) {
-  const [query, setQuery] = useState(); // Search input value
+function SearchBar() {
+  const [query, setQuery] = useState();
+  const [results, setResults] = useState(null);
+  const [error, setError] = useState();
 
-  const fetchData = (value) => {
-    fetch("/api/dictionary")
-      .then((response) => response.json())
-      .then((json) => {
-        const results = json.filter((dictionary) => {
-          return (
-            value &&
-            dictionary &&
-            dictionary.title &&
-            dictionary.title.toLowerCase().includes(value.toLowerCase())
-          );
-        });
-        setResults(results);
-      });
+  const fetchData = async (value) => {
+    try {
+      const response = await fetch("/api/dictionary");
+      const data = await response.json();
+
+      const filteredResults = data.filter((dictionary) =>
+        dictionary?.title?.toLowerCase().includes(value.toLowerCase())
+      );
+      setResults(filteredResults);
+
+      if (value.trim() && filteredResults.length === 0) {
+        setError("No matching results found.");
+      } else {
+        setError(""); // Clear error if valid
+      }
+    } catch (error) {
+      console.log("error fetching data:", error);
+    }
   };
 
-  const handleChange = (value) => {
+  const handleOnChange = (e) => {
+    const value = e.target.value;
     setQuery(value);
     fetchData(value);
   };
 
-  const resetInput = (e) => {
-    e.target.value = "";
+  const handleFocus = (e) => {
+    console.log("Input field is focused");
   };
 
   return (
-    <div className="w-full max-w-sm min-w-[200px]">
-      <div className="relative">
-        <input
-          className="w-full bg-gray-300 placeholder:text-slate-700 text-slate-700 text-sm border border-slate-200 rounded-md pr-3 pl-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
-          placeholder="Magsaliksik..."
-          value={query}
-          onChange={(e) => handleChange(e.target.value)}
-          onFocus={(e) => resetInput(e)}
-        />
-        <div
-          className="absolute top-1 left-1 flex items-center rounded bg-transparent p-1.5 border border-transparent text-center text-sm text-slate-700"
-          type="button"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="w-4 h-4"
-          >
-            <path
-              fillRule="evenodd"
-              d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z"
-              clipRule="evenodd"
-            />
-          </svg>
+    <form>
+      <div className="bg-slate-300 rounded-md w-full max-w-md relative">
+        <div className="flex items-center p-1 gap-1">
+          <div className="p-2 flex justify-center items-center bg-transparent text-black rounded-sm">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="w-4 h-4"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+
+          {/* Search Input*/}
+          <input
+            className="bg-slate-300 w-full outline-none"
+            name="dictionary"
+            placeholder="Magsaliksik..."
+            value={query}
+            onChange={handleOnChange}
+            onFocus={handleFocus}
+          />
         </div>
+
+        {/* error message */}
+        {error && <p className="text-red-500 p-2 text-center">{error}</p>}
+
+        {/* Search Results Dropdown */}
+        {results && (
+          <div className="absolute left-0 w-full rounded-b-md shadow-md bg-gray-300">
+            <div className="max-h-50 overflow-hidden ">
+              {results.map((result) => (
+                <Link
+                  key={result._id}
+                  to={`/dictionary/${result._id}`}
+                  onClick={() => {
+                    setQuery("");
+                    setResults([]);
+                  }}
+                >
+                  <div className="hover:bg-slate-500 p-2 text-black cursor-pointer">
+                    {result.title}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-    </div>
+    </form>
   );
 }
 

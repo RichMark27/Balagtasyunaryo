@@ -3,6 +3,8 @@ import {
   getAllDictionary,
   getDictionary,
   createDictionary,
+  updateDictionary,
+  deleteDictionary,
 } from "../controllers/dictionary.controllers.js";
 
 const dictionaryRouter = Router();
@@ -16,12 +18,8 @@ dictionaryRouter.get("/:id", getDictionary);
 //create a new dictionary
 dictionaryRouter.post("/", createDictionary);
 
-dictionaryRouter.put("/:id", (req, res) =>
-  res.json({ message: "PUT data by id" })
-);
+dictionaryRouter.patch("/:id", updateDictionary);
 
-dictionaryRouter.delete("/:id", (req, res) =>
-  res.json({ message: "DELETE data by id" })
-);
+dictionaryRouter.delete("/:id", deleteDictionary);
 
 export default dictionaryRouter;

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 // get all data
 const getAllDictionary = async (req, res) => {
-  const dictionary = await Dictionary.find({}).sort({ createdAt: -1 });
+  const dictionary = await Dictionary.find({}).sort({ title: 1 });
   res.status(200).json(dictionary);
 };
 //get single data
@@ -40,4 +40,47 @@ const createDictionary = async (req, res) => {
   }
 };
 
-export { getAllDictionary, getDictionary, createDictionary };
+//Update one dictionary
+const updateDictionary = async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ error: "no such dictionary" });
+  }
+
+  const dictionary = await Dictionary.findOneAndUpdate(
+    { _id: id },
+    { ...req.body }
+  );
+
+  if (!dictionary) {
+    return res.status(400).json({ error: "no such dictionary" });
+  }
+
+  res.status(200).json(dictionary);
+};
+
+//Delete one dictionary
+const deleteDictionary = async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ error: "no such dictionary" });
+  }
+
+  const dictionary = Dictionary.findOneAndDelete({ _id: id });
+
+  if (!dictionary) {
+    res.status(400).json({ error: "no such dictionary" });
+  }
+
+  res.status(200).json(dictionary);
+};
+
+export {
+  getAllDictionary,
+  getDictionary,
+  createDictionary,
+  updateDictionary,
+  deleteDictionary,
+};
